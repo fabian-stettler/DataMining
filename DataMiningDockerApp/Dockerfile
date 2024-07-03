@@ -2,7 +2,7 @@
 FROM node:22-alpine3.19
 
 # Create and set the working directory inside the container
-WORKDIR /usr/src/datamining
+WORKDIR /usr/src/dataminingFiles/
 
 # Install necessary libraries for Puppeteer and bash
 RUN apk update && apk add --no-cache \
@@ -27,14 +27,14 @@ ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 
 # Copy package.json and package-lock.json (if available) to the working directory
-COPY package*.json /usr/src/datamining/
+COPY package*.json /usr/src/dataminingFiles/
 
 # Install the dependencies specified in package.json
 RUN npm install
 
 
 # Copy the rest of your application code to the working directory
-COPY . /usr/src/datamining/
+COPY . /usr/src/dataminingFiles/
 
 # Expose the port the application will run on
 EXPOSE 3000

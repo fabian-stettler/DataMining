@@ -13,6 +13,9 @@ const constants = require("./constants");
  * @returns {Promise<*>} all filtered absolute links to all pages which are linked from the current page.
  * filtering does filter out all links with '_' and '#' and duplicate links.
  *
+* @exception page.goto wird direkt gehandelt und führt nicht zu Abbruch des Skriptes sondern nur zu einem Error Log.
+ * @exception page.eval wird direkt gehandelt und führt nicht zu Abbruch des Skriptes sondern nur zu einem Error Log.
+ * @exception error (andere exceptions im try Block) führen zu einem abort über catch.
  */
 
 async function getAllAbsoluteLinks(url, websiteUrl) {
@@ -37,11 +40,12 @@ async function getAllAbsoluteLinks(url, websiteUrl) {
         });
         let filteredLinksHashtagLess = filteredLinksDuplicates.filter( item => !item.includes('#') && !item.includes('_'));
         finalfilteredLinks = filteredLinksHashtagLess.filter(item => item.startsWith(websiteUrl));
-        console.log(finalfilteredLinks.length);
+        console.log('Length of filtered Links: ', finalfilteredLinks.length);
         console.log('Filtered Links:', finalfilteredLinks);
     }
     catch(error){
-        logToFile("Error in extractAllLinksFromWebpage", constants.FILE_PATH_LOG_ERROR);
+        logToFile("Error in extractAllLinksFromWebpage " + error.message , constants.FILE_PATH_LOG_ERROR);
+        logToFile("Abort error occured in <extractAllLinksFromWebpage,js>, siehe letzter Eintrag im File: FILE_PATH_LOG_ERROR", constants.FILE_PATH_LOG_ABORT_ERROR);
         throw error;
     }
     finally {

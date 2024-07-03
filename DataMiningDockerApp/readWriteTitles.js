@@ -3,7 +3,13 @@ const path = require('path');
 const logToFile = require("./logging");
 const constants = require("./constants");
 
-// Utility function to read titles from file
+/**
+ * Utility function to read titles from file
+ * @param filePath is the path from which to read FROM and TO
+ * @param callback
+ * @returns {Promise<unknown>}
+ */
+//
 function readTitlesFromFile(filePath, callback) {
     return new Promise((resolve, reject) => {
         fs.readFile(filePath, 'utf8', (err, data) => {
@@ -12,6 +18,7 @@ function readTitlesFromFile(filePath, callback) {
                     // File does not exist, return an empty array
                     return resolve([]);
                 }
+                logToFile("Error occured in readTitlesFromFile" + err.message, constants.FILE_PATH_LOG_ERROR);
                 return reject(err);
             }
             const titles = data.trim().split('\n').filter(Boolean);
@@ -20,13 +27,21 @@ function readTitlesFromFile(filePath, callback) {
     });
 }
 
-// Utility function to write titles to file
-function appendTitlesToFile(filePath, newArticles, callback) {
+/**
+ *
+ * @param filePath ist der Pfad in welches der neue String geschrieben werden soll
+ * @param newArticles sind die Artikel die am heutigen Tag gesaved wurden
+ * @param callback
+ * @returns {*}
+ * @function overwriteSavedArticles schreibt alle übergebenen Artikel in das file savedArticles und ÜBERSCHREIBT Daten die dort standen.
+ *
+ */
+function overwriteSavedArticles(filePath, newArticles, callback) {
 
     //newArticles not array
     if (!Array.isArray(newArticles)) {
         const error = new TypeError('titles should be an array');
-        logToFile('Error: titles should be an array', constants.FILE_PATH_LOG_ERROR);
+        logToFile('Error: titles should be an array' + error.message, constants.FILE_PATH_LOG_ERROR);
         return callback(error);
     }
 
@@ -38,18 +53,18 @@ function appendTitlesToFile(filePath, newArticles, callback) {
     }
 
     //construct a string
-    let temp = '\n NEW DATE:' + new Date().toISOString().slice(0, 10) + "\n";
+    let temp = "";
     for (let i = 0; i < newArticles.length; i++) {
         temp += newArticles[i] + '\n';
     }
 
     //apend to file
-    fs.appendFile(filePath, temp, 'utf8', (err) => {
+    fs.writeFile(filePath, temp, 'utf8', (err) => {
         if (err) {
-            logToFile("Error in appendFile() when writing new articles to file", constants.FILE_PATH_LOG_ERROR);
+            logToFile("Error in writeFile() when writing new articles to file", constants.FILE_PATH_LOG_ERROR);
             return callback(err);
         } else {
-            logToFile("Successfully writing new articles to file in appendFile()", constants.FILE_PATH_LOG_SUCCESSFULL);
+            logToFile("Successfully overwritten saved articles!", constants.FILE_PATH_LOG_SUCCESSFULL);
             return callback(true);
         }
     });
@@ -57,5 +72,5 @@ function appendTitlesToFile(filePath, newArticles, callback) {
 
 module.exports = {
     readTitlesFromFile,
-    appendTitlesToFile
+    appendTitlesToFile: overwriteSavedArticles
 };
