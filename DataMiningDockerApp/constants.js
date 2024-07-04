@@ -13,6 +13,7 @@ const constants = {
     OUTPUT_DIR: "/usr/src/datamining/htmlFiles",
     LOG_DIR: '/usr/src/datamining/logFiles',
     FILE_PATH_ALREADY_SAVED_ARTICLES: "/usr/src/datamining/logFiles/savedArticles.txt",
+    FILE_PATH_LAST_STATE: "/usr/src/datamining/logFiles/lastState.txt",
     FILE_PATH_SUMMARY: "/usr/src/datamining/logFiles/logFileSummary.txt",
 
     //other

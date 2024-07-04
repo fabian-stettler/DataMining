@@ -39,5 +39,10 @@ COPY . /usr/src/dataminingFiles/
 # Expose the port the application will run on
 EXPOSE 3000
 
-# Execution of control.js
-CMD ["node", "control.js"]
+# Stelle sicher, dass die Logdatei und der Status vorhanden sind
+RUN mkdir -p /usr/src/datamining/logFiles 
+RUN touch /usr/src/datamining/logFiles/logFileAbortError.txt
+RUN touch /usr/src/datamining/logFiles/lastState.txt
+
+# Führe den Mail-Task aus
+CMD ["sh", "-c", "node control.js && node monitorLog.js"]

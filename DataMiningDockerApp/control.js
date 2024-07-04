@@ -1,11 +1,11 @@
 const { getAllAbsoluteLinks } = require('./extractAllLinksFromWebpage.js');
 const saveWebpage = require('./saveFullWebpage');
-const logToFile = require("./logging");
 const {launch} = require("puppeteer");
 const createNewTargetDirectory = require('./createNewTargetDirectory');
 const { readTitlesFromFile, appendTitlesToFile } = require('./readWriteTitles');
 const {sharedArray, newlySavedArticles} = require("./sharedArray");
 const constants = require("./constants");
+const logToFile = require("./logging");
 
 /**
  * controls the execution of the web scrapping task on srf.ch
@@ -97,7 +97,7 @@ async function control() {
         }
     });
 
-    //logging
+    //lconst logToFile = require("./logging");ogging
     logToFile("Summary of execution at " + new Date().toISOString().slice(0, 10) + "\n", constants.FILE_PATH_SUMMARY );
     logToFile("________________________________________________________________________________________________", constants.FILE_PATH_SUMMARY);
     logToFile("Amount of newly saved articles: " + newlySavedArticles + "\n", constants.FILE_PATH_SUMMARY);
