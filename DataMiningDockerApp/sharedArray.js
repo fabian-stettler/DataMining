@@ -8,7 +8,7 @@ let newlySavedArticles = 0;
  */
 function addElement(element) {
     sharedArray.push(element);
-    newlySavedArticles = newlySavedArticles + 1;
+    newlySavedArticles++;
     console.log(`Element ${element} hinzugefügt`);
 }
 

@@ -65,12 +65,12 @@ function overwriteSavedArticles(filePath, newArticles, callback) {
             return callback(err);
         } else {
             logToFile("Successfully overwritten saved articles!", constants.FILE_PATH_LOG_SUCCESSFULL);
-            return callback(true);
+            return callback(null, true);
         }
     });
 }
 
 module.exports = {
     readTitlesFromFile,
-    appendTitlesToFile: overwriteSavedArticles
+    overwriteSavedArticles
 };

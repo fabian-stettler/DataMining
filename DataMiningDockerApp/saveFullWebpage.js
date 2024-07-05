@@ -3,7 +3,7 @@ const path = require('path');
 const logToFile = require('./logging');
 const {launch} = require("puppeteer");
 const puppeteer = require("puppeteer");
-const { addElement} = require('./sharedArray');
+const { addElement, newlySavedArticles} = require('./sharedArray');
 
 const constants = require("./constants");
 

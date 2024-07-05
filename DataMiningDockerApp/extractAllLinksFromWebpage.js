@@ -46,7 +46,7 @@ async function getAllAbsoluteLinks(url, websiteUrl) {
     catch(error){
         logToFile("Error in extractAllLinksFromWebpage " + error.message , constants.FILE_PATH_LOG_ERROR);
         logToFile("Abort error occured in <extractAllLinksFromWebpage,js>, siehe letzter Eintrag im File: FILE_PATH_LOG_ERROR", constants.FILE_PATH_LOG_ABORT_ERROR);
-        throw error;
+        return;
     }
     finally {
         await browser.close();

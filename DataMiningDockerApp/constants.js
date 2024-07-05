@@ -17,7 +17,32 @@ const constants = {
     FILE_PATH_SUMMARY: "/usr/src/datamining/logFiles/logFileSummary.txt",
 
     //other
-    URLS_TO_IGNORE : ["https://www.srf.ch/meteo/wetter"],
+    URLS_TO_IGNORE : ["https://www.srf.ch/meteo/wetter", 'https://www.srf.ch/radio', 'https://medien.srf.ch/',
+        'https://www.srf.ch/ueber-srf-impressum',
+        'https://www.srf.ch/rechtliches-datenschutzerklaerung',
+        'https://www.srf.ch/rechtliches',
+        'https://www.srf.ch/rechtliches-nutzungsbedingungen',
+        'https://www.srgssr.ch/',
+        'https://www.rts.ch/',
+        'https://www.rsi.ch/',
+        'https://www.rtr.ch/',
+        'https://www.swissinfo.ch/',
+        'https://www.3sat.de/',
+    'https://www.srf.ch/news/videos', ],
+    /*
+    possible sites to exclude
+    'https://medien.srf.ch/',
+  'https://www.srf.ch/ueber-srf-impressum',
+  'https://www.srf.ch/rechtliches-datenschutzerklaerung',
+  'https://www.srf.ch/rechtliches',
+  'https://www.srf.ch/rechtliches-nutzungsbedingungen',
+  'https://www.srgssr.ch/',
+  'https://www.rts.ch/',
+  'https://www.rsi.ch/',
+  'https://www.rtr.ch/',
+  'https://www.swissinfo.ch/',
+  'https://www.3sat.de/',
+     */
     NEW_ARTICLES : [],
 };
 
