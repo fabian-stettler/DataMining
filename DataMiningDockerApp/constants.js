@@ -28,21 +28,20 @@ const constants = {
         'https://www.rtr.ch/',
         'https://www.swissinfo.ch/',
         'https://www.3sat.de/',
-    'https://www.srf.ch/news/videos', ],
-    /*
-    possible sites to exclude
-    'https://medien.srf.ch/',
-  'https://www.srf.ch/ueber-srf-impressum',
-  'https://www.srf.ch/rechtliches-datenschutzerklaerung',
-  'https://www.srf.ch/rechtliches',
-  'https://www.srf.ch/rechtliches-nutzungsbedingungen',
-  'https://www.srgssr.ch/',
-  'https://www.rts.ch/',
-  'https://www.rsi.ch/',
-  'https://www.rtr.ch/',
-  'https://www.swissinfo.ch/',
-  'https://www.3sat.de/',
-     */
+        'https://www.srf.ch/news/videos',
+        'https://www.srf.ch/sendungen/dok',
+        'https://www.srf.ch/sendungen/dok/dok-serien',
+        ''],
+
+    SITES_TO_ALWAYS_EXPAND : ['https://www.srf.ch/wissen',
+        'https://www.srf.ch/wissen/gesundheit',
+        'https://www.srf.ch/wissen/nachhaltigkeit',
+        'https://www.srf.ch/wissen/nachhaltigkeit',
+        'https://www.srf.ch/wissen/mensch',
+        'https://www.srf.ch/wissen/natur-tiere',
+        'https://www.srf.ch/wissen/technik',
+        'https://www.srf.ch/wissen/creative-commons'
+    ],
     NEW_ARTICLES : [],
 };
 

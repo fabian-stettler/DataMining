@@ -16,6 +16,7 @@ const constants = require("./constants");
  * conditions for saving the html file are that
  *   1.srfContentId ist vorhanden
  *   2.srfContentId must be equal or bigger than 8
+ *   3.url darf nicht im urls to always expand sein (diese sind ein Sonderfall, weil trotz valider content ID kein Artikel
  *
  * @function addElement wird aufgerufen um die url hinzuzufügen, welche davor gesaved wurde.
  */
@@ -44,7 +45,7 @@ async function saveWebpage(url) {
 
 
         // Check if the content is present and has a length greater than or equal to 8
-        if (srfContentId && srfContentId.length >= 8) {
+        if (srfContentId && srfContentId.length >= 8 && !constants.SITES_TO_ALWAYS_EXPAND.includes(url)) {
             // Save the HTML content to the dynamically created file
             console.log('\x1b[31m%s\x1b[0m', "Before saving file");
             fs.writeFileSync(outputFile, htmlContent);

@@ -19,6 +19,8 @@ async function control() {
     let originSite = "https://www.srf.ch";
     let isArticle = false;
 
+    //always push head sites to extractedLinks
+
     let extractedLinks = await getAllAbsoluteLinks(originSite, originSite);
     console.log(extractedLinks);
 
@@ -57,8 +59,8 @@ async function control() {
     //console.log(articlesAlreadySaved);
     while (extractedLinks.length > 0) {
         let firstLink = extractedLinks.shift();
-        if (!articlesAlreadySaved.includes(firstLink) && !constants.URLS_TO_IGNORE.includes(firstLink) && firstLink.startsWith('https://www.srf.ch')) {
-            if (!alreadyExpandedSites.includes(firstLink) && isArticle === false) {
+        if ((!articlesAlreadySaved.includes(firstLink) || constants.SITES_TO_ALWAYS_EXPAND.includes(firstLink))&& !constants.URLS_TO_IGNORE.includes(firstLink)) {
+            if (!alreadyExpandedSites.includes(firstLink)) {
                 let newSubLinks = await getAllAbsoluteLinks(firstLink, firstLink);
                 for (let currentLink of newSubLinks) {
                     if (alreadyVisitedSites.includes(currentLink)) {
@@ -91,7 +93,6 @@ async function control() {
         if (err) {
             logToFile("Error when saving new 'Saved articles' to alreadySavedArticles siehe constants.FILE_PATH_LOG_ERROR", constants.FILE_PATH_LOG_ABORT_ERROR);
             console.log("Error occured on line 93!!!");
-            //throw new Error();
         } else {
             logToFile("Successfully saved new 'Saved articles' to alreadySavedArticles", constants.FILE_PATH_LOG_SUCCESSFULL)
         }
