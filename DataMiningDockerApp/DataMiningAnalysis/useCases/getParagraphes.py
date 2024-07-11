@@ -20,8 +20,8 @@ def extract_paragraphs_from_section(file_path):
 
 
 
+"""
 paragraphs = extract_paragraphs_from_section('C:\\Users\\fabia\\Desktop\\htmlFiles\\htmlFiles\\2024-07-04\\output_19966881_vr-im-dienst-der-medizin-mit-dem-patienten-im-koerper-des-patienten.html')
 
 print(paragraphs)
-
-
+"""

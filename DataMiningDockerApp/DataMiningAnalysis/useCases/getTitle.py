@@ -19,7 +19,8 @@ def extract_title_from_html(file_path):
 
 
 
-
+"""
 title = extract_title_from_html('C:\\Users\\fabia\\Desktop\\htmlFiles\\htmlFiles\\2024-07-04\\output_19966881_vr-im-dienst-der-medizin-mit-dem-patienten-im-koerper-des-patienten.html')
 
 print(f"Title: {title}")
+"""
