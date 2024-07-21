@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
-
-def extract_author_from_html(file_path):
+import re
+def extract_author_from_html(soup):
     """
     Extrahiert die Autoren aus einer HTML-Datei und gibt sie als Array zurück.
     Entweder ein Kürzel oder ein voller Name. Meine Vermutung:
@@ -10,10 +10,8 @@ def extract_author_from_html(file_path):
     :param file_path: Pfad zur entsprechenden HTML-Datei
     :return: Liste der Autoren
     """
-    with open(file_path, 'r', encoding='utf-8') as file:
-        html_content = file.read()
 
-    soup = BeautifulSoup(html_content, 'html.parser')
+    keyword_to_exclude = ["sda"]
 
     # Try to find the author in the first pattern
     author_tag = soup.find('p', class_='article-reference')
@@ -28,12 +26,14 @@ def extract_author_from_html(file_path):
     if author_div:
         author_name = author_div.find('span', itemprop='name')
         if author_name:
-            authors = author_name.get_text(strip=True).split(';')
-            return [author.strip() for author in authors]
+            author_text = author_name.get_text(strip=True)
+            authors = [author.strip() for author in re.split(r'[\,;]', author_text)]
+            return authors
 
     return ["Author not found"]
 
-# Example usage
+""" Example usage
 file_path = "C:\\Users\\fabia\\Desktop\\htmlFiles\\htmlFiles\\2024-07-04\\output_19955553_artensterben-in-den-alpen-fuer-bergvoegel-wird-die-luft-duenn.html"
 authors = extract_author_from_html(file_path)
 print(f"Authors: {authors}")
+"""

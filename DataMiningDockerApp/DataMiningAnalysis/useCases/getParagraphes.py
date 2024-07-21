@@ -1,15 +1,12 @@
 from bs4 import BeautifulSoup
 
-def extract_paragraphs_from_section(file_path):
+def extract_paragraphs_from_section(soup):
     """
     Diese Funktion gibt immer mindestens einen paragraph zurück.
 
    :param file_path des geöffneten files
    :return: return aller Paragraphen als array.
    """
-    with open(file_path, 'r', encoding='utf-8') as file:
-        html_content = file.read()
-    soup = BeautifulSoup(html_content, 'html.parser')
     section = soup.find('section', class_='article-content', itemprop='articleBody')
 
     if not section:

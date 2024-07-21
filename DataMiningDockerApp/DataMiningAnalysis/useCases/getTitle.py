@@ -1,15 +1,14 @@
 from bs4 import BeautifulSoup
 
-def extract_title_from_html(file_path):
+def extract_title_from_html(soup):
     """
     Diese Funktion muss immer genau einen Titel zurückgeben.
+    Achtung dieser Titel ist nicht immer derjenige der displayed wird, sondern
+    der titel im header aber mit Berücksichtigung der Gross Klein Schreibung
 
     :param html_content: html des geöffneten files
     :return: return des Artikel Titels als String
     """
-    with open(file_path, 'r', encoding='utf-8') as file:
-        html_content = file.read()
-    soup = BeautifulSoup(html_content, 'html.parser')
     meta_tag = soup.find('meta', attrs={'name': 'headline'})
 
     if meta_tag and 'content' in meta_tag.attrs:

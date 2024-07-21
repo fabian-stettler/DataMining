@@ -1,4 +1,5 @@
 # Use the official Node.js image from the Docker Hub
+# Dieses Dockerfile ist dasjenige fürs Scrappen von SRF
 FROM node:22-alpine3.19
 
 # Create and set the working directory inside the container

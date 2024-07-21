@@ -1,15 +1,13 @@
 from bs4 import BeautifulSoup
 
-def find_dates(file_path):
+def find_dates(soup):
     """
     Gibt das publication und modification date in einem array der länge 2 zurück.
 
     :param file_path: path des momentanen files
     :return: publication und last modification date return als Array
     """
-    with open(file_path, 'r', encoding='utf-8') as file:
-        html_content = file.read()
-    soup = BeautifulSoup(html_content, 'html.parser')
+
     tag = soup.find('p', class_='article-author__date js-dateline')
 
     publication_date = None

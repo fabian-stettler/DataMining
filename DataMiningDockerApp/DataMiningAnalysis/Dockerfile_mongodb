@@ -1,0 +1,15 @@
+FROM mongo:latest
+
+# Installiere mongo-tools
+RUN apt-get update && apt-get install -y mongo-tools
+
+# Kopiere das Init-Skript und die Daten in das Arbeitsverzeichnis
+COPY ./init-mongo.sh /usr/src/MongoDB/init-mongo.sh
+COPY ./yourdata.json /usr/src/MongoDB/yourdata.json
+
+# Setze Umgebungsvariablen
+ENV MONGO_INITDB_ROOT_USERNAME=admin
+ENV MONGO_INITDB_ROOT_PASSWORD=secret
+
+# Führe das Init-Skript aus
+ENTRYPOINT ["sh", "-c", "mongod & sleep 5 && /usr/src/init-mongo.sh && tail -f /dev/null"]

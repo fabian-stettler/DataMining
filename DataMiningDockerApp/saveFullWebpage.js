@@ -74,4 +74,5 @@ async function saveWebpage(url) {
     return isArticle;
 }
 
+saveWebpage("https://www.srf.ch/kultur/gesellschaft-religion/brennpunkt-asien-china-vs-taiwan-springt-der-funke-ins-pulverfass")
 module.exports = saveWebpage;
