@@ -31,7 +31,6 @@ def controlAnalysis(directory):
     """
 
     # Connect to the MongoDB server running on a container on the same "network" thanks to .yml file
-    sleep(20)
     print(1, "MongoDB Connection initialization started")
     client = MongoClient("mongodb://admin:secret@mongodb:27017/?authSource=admin", 27017)
     db = client['Datamining_Srf']
@@ -91,7 +90,6 @@ def controlAnalysis(directory):
 
 today_date = datetime.now()
 formatted_today_date = today_date.strftime('%Y-%m-%d')
-formatted_today_date = "2024-07-12"
 print(formatted_today_date)
 
 print(1, "Skript control analysis was triggered")

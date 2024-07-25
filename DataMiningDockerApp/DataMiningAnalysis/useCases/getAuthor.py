@@ -1,13 +1,16 @@
-from bs4 import BeautifulSoup
 import re
+from bs4 import BeautifulSoup
+
+
+
 def extract_author_from_html(soup):
     """
-    Extrahiert die Autoren aus einer HTML-Datei und gibt sie als Array zurück.
+    Extrahiert die Autoren aus einer HTML-Datei und gibt sie als Liste zurück.
     Entweder ein Kürzel oder ein voller Name. Meine Vermutung:
     1. Eigene Artikel --> voller Name
     2. Fremde Artikel --> Kürzel
 
-    :param file_path: Pfad zur entsprechenden HTML-Datei
+    :param soup: BeautifulSoup-Objekt der HTML-Datei
     :return: Liste der Autoren
     """
 
@@ -18,8 +21,9 @@ def extract_author_from_html(soup):
     if author_tag:
         author_name = author_tag.find('span', itemprop='name')
         if author_name:
-            authors = author_name.get_text(strip=True).split(';')
-            return [author.strip() for author in authors]
+            author_text = author_name.get_text(strip=True)
+            authors = [author.strip() for author in re.split(r'[\/,;]', author_text)]
+            return authors
 
     # Try to find the author in the second pattern
     author_div = soup.find('div', class_='article-author')
@@ -27,13 +31,18 @@ def extract_author_from_html(soup):
         author_name = author_div.find('span', itemprop='name')
         if author_name:
             author_text = author_name.get_text(strip=True)
-            authors = [author.strip() for author in re.split(r'[\,;]', author_text)]
+            authors = [author.strip() for author in re.split(r'[\/,;]', author_text)]
             return authors
 
     return ["Author not found"]
 
 """ Example usage
-file_path = "C:\\Users\\fabia\\Desktop\\htmlFiles\\htmlFiles\\2024-07-04\\output_19955553_artensterben-in-den-alpen-fuer-bergvoegel-wird-die-luft-duenn.html"
-authors = extract_author_from_html(file_path)
-print(f"Authors: {authors}")
+
+directory = "C:\\Users\\fabia\\Desktop\\htmlFiles\\htmlFiles\\2024-07-07"
+for file_path in get_all_absolute_paths(directory):
+    with open(file_path, 'r', encoding='utf8') as file:
+        html_content = file.read()
+    soup = BeautifulSoup(html_content, 'html.parser')
+    authors = extract_author_from_html(soup)
+    print(f"Authors: {authors} for article {file_path}")
 """

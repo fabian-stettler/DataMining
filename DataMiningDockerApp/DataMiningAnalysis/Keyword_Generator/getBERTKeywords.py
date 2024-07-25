@@ -1,21 +1,19 @@
-from transformers import AutoTokenizer, AutoModel
+from transformers import AutoModel
 from keybert import KeyBERT
+from collections import defaultdict
 
 def weighted_keywords(keywords, weight):
     return [(kw, score * weight) for kw, score in keywords]
 
-def getBERTKeywords(lead, title, subtitles, paragraphs, model = AutoModel.from_pretrained("dbmdz/bert-base-german-cased")):
-
-
-
+def getBERTKeywords(lead, title, subtitles, paragraphs, model=AutoModel.from_pretrained("dbmdz/bert-base-german-cased")):
     # Initialisieren von KeyBERT mit dem geladenen Modell
     kw_model = KeyBERT(model)
 
-    # Beispieltexte
-    lead = lead
-    title = title
-    subtitles = subtitles
-    paragraphs = paragraphs
+    # Debug statement to check 'lead'
+    print("Lead before extract_keywords:", lead)
+    print("Subtitles before extract_keywords:", subtitles)
+    print("Title before extract_keywords:", title)
+    print("Paragraphs before extract_keywords:", paragraphs)
 
     # Gewichtung der Textteile
     lead_weight = 2
@@ -23,26 +21,37 @@ def getBERTKeywords(lead, title, subtitles, paragraphs, model = AutoModel.from_p
     subtitle_weight = 0.7
     paragraph_weight = 0.5
 
-    #Anzahl an Keywords für return
+    # Anzahl an Keywords für return
     anzahl_an_return_keywords = 4
 
+    all_keywords = []
+
     # Keywords extrahieren und gewichten
-    lead_keywords = kw_model.extract_keywords(lead, keyphrase_ngram_range=(1, 2), stop_words=None, top_n=5)
-    title_keywords = kw_model.extract_keywords(title, keyphrase_ngram_range=(1, 2), stop_words=None, top_n=5)
-    subtitle_keywords = [kw_model.extract_keywords(sub, keyphrase_ngram_range=(1, 2), stop_words=None, top_n=5) for sub in subtitles]
-    paragraph_keywords = [kw_model.extract_keywords(p, keyphrase_ngram_range=(1, 2), stop_words=None, top_n=5) for p in paragraphs]
+    if lead:
+        lead_keywords = kw_model.extract_keywords(lead, keyphrase_ngram_range=(1, 2), stop_words=None, top_n=5)
+        weighted_lead_keywords = weighted_keywords(lead_keywords, lead_weight)
+        all_keywords.extend(weighted_lead_keywords)
 
-    # Gewichtete Keywords zusammenführen
-    weighted_lead_keywords = weighted_keywords(lead_keywords, lead_weight)
-    weighted_title_keywords = weighted_keywords(title_keywords, title_weight)
-    weighted_subtitle_keywords = [weighted_keywords(sub_keywords, subtitle_weight) for sub_keywords in subtitle_keywords]
-    weighted_paragraph_keywords = [weighted_keywords(p_keywords, paragraph_weight) for p_keywords in paragraph_keywords]
+    if title:
+        title_keywords = kw_model.extract_keywords(title, keyphrase_ngram_range=(1, 2), stop_words=None, top_n=5)
+        weighted_title_keywords = weighted_keywords(title_keywords, title_weight)
+        all_keywords.extend(weighted_title_keywords)
 
-    # Alle gewichteten Keywords zusammenführen
-    all_keywords = weighted_lead_keywords + weighted_title_keywords + [kw for sublist in weighted_subtitle_keywords for kw in sublist] + [kw for sublist in weighted_paragraph_keywords for kw in sublist]
+    if subtitles:
+        for sub in subtitles:
+            if sub:
+                sub_keywords = kw_model.extract_keywords(sub, keyphrase_ngram_range=(1, 2), stop_words=None, top_n=5)
+                weighted_subtitle_keywords = weighted_keywords(sub_keywords, subtitle_weight)
+                all_keywords.extend(weighted_subtitle_keywords)
+
+    if paragraphs:
+        for p in paragraphs:
+            if p:
+                p_keywords = kw_model.extract_keywords(p, keyphrase_ngram_range=(1, 2), stop_words=None, top_n=5)
+                weighted_paragraph_keywords = weighted_keywords(p_keywords, paragraph_weight)
+                all_keywords.extend(weighted_paragraph_keywords)
 
     # Deduplizieren und nach Gewicht sortieren
-    from collections import defaultdict
     keyword_dict = defaultdict(float)
     for kw, score in all_keywords:
         keyword_dict[kw] += score
@@ -54,5 +63,3 @@ def getBERTKeywords(lead, title, subtitles, paragraphs, model = AutoModel.from_p
     relevant_keywords = [kw for kw, score in sorted_keywords[:anzahl_an_return_keywords]]
 
     return relevant_keywords
-
-

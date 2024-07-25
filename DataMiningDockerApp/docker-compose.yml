@@ -5,39 +5,27 @@ services:
     image: mongo:latest
     container_name: mongodb_container
     volumes:
-      - C:/Users/fabia/Desktop/DataminingMongoDBBackup:/data/db
-      - C:/Users/fabia/Desktop/DataminingMongoDBBackup:/backup
-      - ./init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
-      - ./currentData.json:/docker-entrypoint-initdb.d/currentData.json:ro
+      - /media/pi/Data/DataMiningProjekt/mongoDBStuff/data:/data/db
+      - /media/pi/Data/DataMiningProjekt/mongoDBStuff:/backup
+      - /media/pi/Data/DataMiningProjekt/mongoDBStuff/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
+      - /media/pi/Data/DataMiningProjekt/mongoDBStuff/currentData.json:/docker-entrypoint-initdb.d/currentData.json:ro
+      - ./setupDockerMongoDB.sh:/setupDockerMongoDB.sh:ro
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=secret
-    command: >
-      bash -c '
-      apt-get update && apt-get install -y wget gnupg && 
-      wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | apt-key add - && 
-      echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/debian buster/mongodb-org/4.4 main" | tee /etc/apt/sources.list.d/mongodb-org-4.4.list && 
-      apt-get update && apt-get install -y mongodb-database-tools cron && 
-      mongod --bind_ip_all --fork --logpath /var/log/mongodb.log && 
-      sleep 5 && 
-      /docker-entrypoint-initdb.d/init-mongo.sh && 
-      echo "5 19 * * * root mongodump --out /backup/dump-$(date +\%F) --uri='mongodb://admin:secret@localhost:27017/?authSource=admin' && mongoexport --uri='mongodb://admin:secret@localhost:27017/Datamining_Srf?authSource=admin' --collection=Articles --out=/docker-entrypoint-initdb.d/currentData.json --jsonArray" > /etc/cron.d/mongobackup && 
-      crontab /etc/cron.d/mongobackup && 
-      cron && 
-      tail -f /dev/null
-      '
-    restart: no
+    command: ["/bin/bash", "/setupDockerMongoDB.sh"]
+    restart: "always"
     networks:
       - datamining_network
 
   analyze_html:
-    image: analyze_html_image  # Verweise auf das lokal gebaute Image
+    image: fabianstettler/analyze_html_image  # Verweise auf das lokal gebaute Image
     container_name: analyze_html_container
     volumes:
-      - C:/Users/fabia/Desktop/htmlFiles:/usr/src/datamining
+      - /media/pi/Data/DataMiningProjekt:/usr/src/datamining
     depends_on:
       - mongodb
-    restart: no
+    restart: "no"
     networks:
       - datamining_network
 
