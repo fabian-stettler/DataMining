@@ -21,9 +21,10 @@ from useCases.getSubtitles import extract_subtitles_from_html
 from useCases.getTitle import extract_title_from_html
 
 
-def controlAnalysis(directory):
+def controlHtmlExtraction(directory):
     """
-    :param directory: Directory, welches Artikel enthält die analysiert und gespeichert werden sollen.
+    This specific version of this script only works for this system here
+    :param directory: Directory, welcher Artikel enthält die analysiert und gespeichert werden sollen.
     :controlAnalysis
      1.analysiert und extrahiert Informationen aus den html files
      2.erstellt ein neues Objekt und sichert es in MongoDB --> Datamining_Srf --> Articles
@@ -45,47 +46,70 @@ def controlAnalysis(directory):
     #read file and make soup object
     print(1, "Analysation logging has begun")
     print("Directory mit Pfaden ist: " + directory)
-    all_absolute_paths = get_all_absolute_paths(directory)
-    print("get_all_absolute_paths BEENDET")
-    for ele in all_absolute_paths:
-        print(ele)
-    for file_path in all_absolute_paths:
-        with open(file_path, 'r', encoding='utf8') as file:
-            html_content = file.read()
-        soup = BeautifulSoup(html_content, 'html.parser')
 
-        #make Analysis of different parts
-        author = extract_author_from_html(soup)
-        paragraphs = extract_paragraphs_from_section(soup)
-        publication_date, modification_date = find_dates(soup)
-        rubrik = find_meta_content(soup)
-        subtitles = extract_subtitles_from_html(soup)
-        titles = extract_title_from_html(soup)
-        baseKeyWords = getBaseKeywords(soup, directory)
-        contentId = getContentID(soup)
-        linkedArticles = getLinkedArticles(soup)
-        commentsOn = getCommentsOn(soup)
-        additionalKeywords = getBERTKeywords(extract_first_overline_title(soup), extract_title_from_html(soup), extract_subtitles_from_html(soup), extract_paragraphs_from_section(soup), model)
+    #temp all dir
+    alldir = [
+        "/usr/src/datamining/htmlFiles/2024-07-04", "/usr/src/datamining/htmlFiles/2024-07-07", "/usr/src/datamining/htmlFiles/2024-07-09", "/usr/src/datamining/htmlFiles/2024-07-10", "/usr/src/datamining/htmlFiles/2024-07-11",
+        "/usr/src/datamining/htmlFiles/2024-07-12", "/usr/src/datamining/htmlFiles/2024-07-13", "/usr/src/datamining/htmlFiles/2024-07-14", "/usr/src/datamining/htmlFiles/2024-07-15", "/usr/src/datamining/htmlFiles/2024-07-16",
+        "/usr/src/datamining/htmlFiles/2024-07-17", "/usr/src/datamining/htmlFiles/2024-07-18", "/usr/src/datamining/htmlFiles/2024-07-19", "/usr/src/datamining/htmlFiles/2024-07-20", "/usr/src/datamining/htmlFiles/2024-07-21",
+        "/usr/src/datamining/htmlFiles/2024-07-22", "/usr/src/datamining/htmlFiles/2024-07-23", "/usr/src/datamining/htmlFiles/2024-07-24"
+    ]
 
-        #make object
-        document = {
-            "author": author,
-            "paragraphs": paragraphs,
-            "publication_date": publication_date,
-            "modification_date": modification_date,
-            "rubrik": rubrik,
-            "subtitles": subtitles,
-            "titles": titles,
-            "base_keywords": baseKeyWords,
-            "additional_keywords": additionalKeywords,
-            "content_id": contentId,
-            "linked_articles": linkedArticles,
-            "commentsOn": commentsOn
-        }
 
-        #save the Object in DB
-        collection.insert_one(document)
-        print("Entry corresponding to article with ContentID: " + str(contentId) + "and title: " + titles + "was saved")
+    #temp loop
+    for currentdirectory in alldir:
+        try:
+            all_absolute_paths = get_all_absolute_paths(currentdirectory)
+            print(f"Processing directory: {currentdirectory}, found {len(all_absolute_paths)} files.")
+            for file_path in all_absolute_paths:
+                print(f"Processing file: {file_path}")
+                try:
+                    with open(file_path, 'r', encoding='utf8') as file:
+                        html_content = file.read()
+                    soup = BeautifulSoup(html_content, 'html.parser')
+
+                    # Extrahiere Informationen aus dem HTML-Inhalt
+                    author = extract_author_from_html(soup)
+                    paragraphs = extract_paragraphs_from_section(soup)
+                    publication_date, modification_date = find_dates(soup)
+                    rubrik = find_meta_content(soup)
+                    subtitles = extract_subtitles_from_html(soup)
+                    titles = extract_title_from_html(soup)
+                    baseKeyWords = getBaseKeywords(soup, currentdirectory)
+                    contentId = getContentID(soup)
+                    linkedArticles = getLinkedArticles(soup)
+                    commentsOn = getCommentsOn(soup)
+                    additionalKeywords = getBERTKeywords(
+                        extract_first_overline_title(soup),
+                        extract_title_from_html(soup),
+                        extract_subtitles_from_html(soup),
+                        extract_paragraphs_from_section(soup),
+                        model
+                    )
+
+                    # Erstelle das Dokument und speichere es in der Datenbank
+                    document = {
+                        "author": author,
+                        "paragraphs": paragraphs,
+                        "publication_date": publication_date,
+                        "modification_date": modification_date,
+                        "rubrik": rubrik,
+                        "subtitles": subtitles,
+                        "titles": titles,
+                        "base_keywords": baseKeyWords,
+                        "additional_keywords": additionalKeywords,
+                        "content_id": contentId,
+                        "linked_articles": linkedArticles,
+                        "commentsOn": commentsOn
+                    }
+                    collection.insert_one(document)
+                    print(f"Entry saved: {contentId}, {titles}")
+
+                except Exception as e:
+                    print(f"Error processing file {file_path}: {e}")
+        except Exception as e:
+            print(f"Error processing directory {currentdirectory}: {e}")
+
 
 
 today_date = datetime.now()
@@ -93,4 +117,4 @@ formatted_today_date = today_date.strftime('%Y-%m-%d')
 print(formatted_today_date)
 
 print(1, "Skript control analysis was triggered")
-controlAnalysis("/usr/src/datamining/htmlFiles/" + formatted_today_date)
+controlHtmlExtraction("/usr/src/datamining/htmlFiles/" + formatted_today_date)
