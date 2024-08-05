@@ -23,7 +23,7 @@ def find_dates(soup):
 
 
 
-"""
+'''
 publication_date, modification_date = find_dates('C:\\Users\\fabia\\Desktop\\htmlFiles\\htmlFiles\\2024-07-07\\output_145604398_hochwasser-im-wallis-welche-zukunft-hat-die-industrie-in-siders-und-chippis.html')
 
 if publication_date:
@@ -35,4 +35,4 @@ if modification_date:
     print(f"Modification Date: {modification_date}")
 else:
     print("Modification Date not found")
-"""
+'''

@@ -1,0 +1,6 @@
+- all the files in this directory are supposed to analyze the saved html files.
+- in use cases I extract the valuable information out of the html files
+- in Keyword_Generator I provide the Language Models to create keywords to each article
+- controlAnalysis.py does trigger all the other python files and does serve as a "control file"
+- Dockerfile does generate a docker image with the necessary packages and files. This is important because it gets executed on my Raspberry PI.
+- 

@@ -1,0 +1,2 @@
+- this directory contains files which will be triggered automatically when new data gets loaded into the local MongoDB
+- 

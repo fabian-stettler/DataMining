@@ -1,0 +1,5 @@
+- this directory provides interesting use cases.
+- The data is read out of a mongoDB and then analyzed accordingly.
+- Examples of use cases are: heatmap of publish dates of articles, or the articles per genre or a sentiment Analysis of a certain aspect.
+- Furthermore it also contains a functionality to extract sentiments of all articles concerning a specific aspect.
+- 

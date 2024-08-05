@@ -8,7 +8,7 @@ services:
       - /media/pi/Data/DataMiningProjekt/mongoDBStuff/data:/data/db
       - /media/pi/Data/DataMiningProjekt/mongoDBStuff:/backup
       - /media/pi/Data/DataMiningProjekt/mongoDBStuff/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
-      - /media/pi/Data/DataMiningProjekt/mongoDBStuff/currentData.json:/docker-entrypoint-initdb.d/currentData.json:ro
+      - /media/pi/Data/DataMiningProjekt/mongoDBStuff/currentData.json:/docker-entrypoint-initdb.d/currentData.json
       - ./setupDockerMongoDB.sh:/setupDockerMongoDB.sh:ro
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
