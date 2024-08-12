@@ -35,4 +35,4 @@ def sentimentAnalysis(aspect, filter):
         print("Articles related to sentiments negative" + str(connectingArticlesNegative))
         print("Articles related to sentiments positive" + str(connectingArticlesPositive))
 
-sentimentAnalysis("Berset", 0.0)
+sentimentAnalysis("Trump", 0.9)

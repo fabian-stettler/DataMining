@@ -22,7 +22,7 @@ def getBERTKeywords(lead, title, subtitles, paragraphs, model=AutoModel.from_pre
     paragraph_weight = 0.5
 
     # Anzahl an Keywords für return
-    anzahl_an_return_keywords = 4
+    anzahl_an_return_keywords = 10
 
     all_keywords = []
 

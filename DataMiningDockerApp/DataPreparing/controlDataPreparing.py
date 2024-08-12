@@ -91,5 +91,5 @@ def prepareMongoDBData(dateToGenerateSentimentsFrom):
         controlSentimentExtraction(aspect, dateToGenerateSentimentsFrom)
 
 #date format yyyy-mm-dd
-#letztes Datum, an welchem die DB geladen wurde 04.08.2024
-prepareMongoDBData("2024-08-02T00:00:00.000+00:00")
+#letztes Datum, an welchem die DB geladen wurde 11.08.2024
+prepareMongoDBData("2024-08-04T00:00:00.000+00:00")

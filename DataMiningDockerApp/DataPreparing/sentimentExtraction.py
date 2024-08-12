@@ -53,6 +53,7 @@ def controlSentimentExtraction(aspect, date_str):
     '''
     documents = []
     date = datetime.strptime(date_str, DATE_FORMAT)
+
     with connectToMongoDBCollection("Datamining_Srf", "Articles") as collectionArticles:
         answer = collectionArticles.find({
             'paragraphs': {
@@ -83,8 +84,6 @@ def controlSentimentExtraction(aspect, date_str):
 
             for text in paragraphs:
                 paragraph_number += 1
-
-
                 while len(text) > 511:
                     split_count += 1
                     if split_count > max_splits:
@@ -103,8 +102,8 @@ def controlSentimentExtraction(aspect, date_str):
                 sentiment = aspect_based_sentiment(text, aspect)
                 print(f"Sentiment für '{aspect}': {sentiment['label']} mit einem Score von {sentiment['score']}")
 
-                if sentiment['score']:
-                    samples.append([sentiment['label'], sentiment['score'], paragraph_number, entry['titles']])
+                if sentiment['score'] and aspect.lower() in text.lower():
+                    samples.append([sentiment['label'], sentiment['score'], paragraph_number, entry['titles'], text])
                     print("sentiment added")
                 else:
                     print("sentiment not added")
@@ -134,11 +133,13 @@ def controlSentimentExtraction(aspect, date_str):
                     'content_id': entry.get('content_id'),
                     'publication_date': entry.get('publication_date'),
                     'paragraph_number': sent[2] if len(sent) > 2 else 'N/A',
-                    'title': sent[3]
+                    'title': sent[3],
+                    'paragraph': sent[4]
                 })
 
             if document['samples']:
                 documents.append(document)
+                print("SAMPLE ADDED TO documents array")
 
     if documents:
         with connectToMongoDBCollection('Datamining_Srf', 'Sentiment') as collectionSentiment:
@@ -146,6 +147,7 @@ def controlSentimentExtraction(aspect, date_str):
             print(f'Documents inserted with IDs: {result.inserted_ids}')
             print(f'{len(documents)} were newly inserted into MongoDB for aspect {aspect}')
 
-
-controlSentimentExtraction('Berset', BEGINNING_DATE)
+    else:
+        print("not entered in Mongo add function")
+controlSentimentExtraction('Selenski', BEGINNING_DATE)
 
