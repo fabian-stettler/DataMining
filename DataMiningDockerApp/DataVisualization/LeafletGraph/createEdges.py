@@ -1,7 +1,6 @@
-from DataVisualization.LeafletGraph.countKeywords import countKeywords
+from DataVisualization.LeafletGraph.countKeywords import countKeywords, getMongoDBEntries
 from connectToMongoDBCollection import connectToMongoDBCollection
 from constants import KEYWORDS_TO_IGNORE
-
 
 def update_edges(key, edgesDictionary, allKeywords):
     '''
@@ -16,94 +15,95 @@ def update_edges(key, edgesDictionary, allKeywords):
 
     #print(allKeywords)
 
-    for ele in allKeywords:
-        #print("This is an element" + ele)
-        if key in ele:
-            dictConnectedKeywords = edgesDictionary.get(key)
-            if dictConnectedKeywords is None:
-                #dict to this keyword does not exist
-                edgesDictionary[key] = {}
-                connectedKeywords = edgesDictionary[key]
-                connectedKeywords[ele] = 1
-            else:
-                #dict to this keyword exists already
-                connectedKeywords = dictConnectedKeywords.get(ele)
-                if connectedKeywords is None:
-                    #inner dict does not contain connected keywords
-                    dictConnectedKeywords[ele] = 1
+    for keywordsOfArticle in allKeywords:
+        for keyword in keywordsOfArticle:
+            #print("This is an element" + keywordsOfArticle)
+            if key in keyword:
+                dictConnectedKeywords = edgesDictionary.get(key)
+                if dictConnectedKeywords is None:
+                    #dict to this keyword does not exist
+                    edgesDictionary[key] = {}
+                    connectedKeywords = edgesDictionary[key]
+                    connectedKeywords[keyword] = 1
                 else:
-                    #inner dict does contain the connected keyword
-                    dictConnectedKeywords[ele] = connectedKeywords + 1
+                    #dict to this keyword exists already
+                    connectedKeywords = dictConnectedKeywords.get(keyword)
+                    if connectedKeywords is None:
+                        #inner dict does not contain connected keywords
+                        dictConnectedKeywords[keyword] = 1
+                    else:
+                        #inner dict does contain the connected keyword
+                        dictConnectedKeywords[keyword] = connectedKeywords + 1
     return edgesDictionary
 def createEdges(sorted_keywords):
     '''
-    This function creates the "edges" to all keywords in the top percent of keywords
-    The function only consideres connections which are in the top percent of connectedKeywords and have a minimum of absolute counts.
-    :return: Ein dictionary mit den key values, welche aus den Keywords besteht, von welchen die connections ausgehen.
-    Die values dieses dictionary sind wiederum dictionaries mit keywords als keys und counts dieser keywords als values
+    :param sorted_keywords: Ist ein Dictionary mit allen Keywords als items und die Anzahl wie oft sie in allen Artikel vorkommen als value.
+    :return: eine dict Matrix mit den topkeys und allen connected keywords mit ihrer Anzahl
     '''
-    #print(sorted_keywords)
-    global base_keywords
-    global additional_keywords
-    with connectToMongoDBCollection('Datamining_Srf', 'Articles') as collectionArticles:
-        allArticlesWithKeywords = collectionArticles.find({
-            'base_keywords':  { '$exists': True },
-            'additional_keywords': { '$exists': True }
-        })
-        #print('Should now print articles')
-        allKeywords = []
-        for article in allArticlesWithKeywords:
-            base_keywords = article['base_keywords']
-            additional_keywords = article['additional_keywords']
-            if additional_keywords not in KEYWORDS_TO_IGNORE:
-                allKeywords.extend(additional_keywords)
-            if base_keywords not in KEYWORDS_TO_IGNORE:
-                allKeywords.extend(base_keywords)
-        #print(allKeywords)
-        lengthKeywords = len(sorted_keywords)
-        #print(lengthKeywords)
-        amountOfInnerNodes = int((lengthKeywords/100) * 20)
+    #constants to manipulate amount of nodes and structure of the graph
+    percentageOfInnerNodes = 20
+    percentageAmountOfOuterNodes = 30
+    minimalWeightOfConsideredConnection = 8
 
-        edgesDictionary = {}
-        keys = list(sorted_keywords.keys())
-        #print(keys[1])
-        topkeys = keys[:amountOfInnerNodes]
-        #print(topkeys)
-        #print(len(topkeys))
+    #remove all keywords which are in our exlude List
+    articlesWithKeywords = getMongoDBEntries()
+    for article in articlesWithKeywords:
+        for keyword in article:
+            if keyword in KEYWORDS_TO_IGNORE:
+                article.remove(keyword)
+    #getLength of our sorted_keywords
+    lengthKeywords = len(sorted_keywords)
 
-        for topkey in topkeys:
-            edgesDictionary = update_edges(topkey, edgesDictionary, allKeywords)
-        #print(edgesDictionary)
-        #print(len(edgesDictionary.keys()))
-        # filter out x percent of the connected keywords
-        # Gegebene Parameter
-        percentageAmountOfBorderNodes = 30
-        minimalWeightOfConsideredConnection = 8
+    #define the amount of inner nodes
+    amountOfInnerNodes = int((lengthKeywords/100) * percentageOfInnerNodes)
 
-        # Neuen gefilterten Dictionary erstellen
-        filtered_edgesDictionary = {}
+    #extract the all keys of our sorted_keywords
+    keys = list(sorted_keywords.keys())
 
-        for keyword, connections in edgesDictionary.items():
-            lengthOfCurrentConnectedKeywords = len(connections)
-            amountOfConnectionsToBeConsidered = (lengthOfCurrentConnectedKeywords / 100) * percentageAmountOfBorderNodes
-            currentAmountOfConnectionToBeConsidered = 0
+    #filter the inner Nodes
+    topkeys = keys[:amountOfInnerNodes]
 
-            # Sortieren der Verbindungen nach Gewicht
-            sorted_connections = dict(sorted(connections.items(), key=lambda item: item[1], reverse=True))
-            # Initialisiere eine neue Liste für gefilterte Verbindungen
-            filtered_connections = {}
+    #update the edges of our Dictionary
+    edgesDictionary = {}
+    for topkey in topkeys:
+        edgesDictionary = update_edges(topkey, edgesDictionary, articlesWithKeywords)
 
-            for connected_keyword, weight in sorted_connections.items():
-                #print(connected_keyword, weight)
-                if weight >= minimalWeightOfConsideredConnection and currentAmountOfConnectionToBeConsidered < amountOfConnectionsToBeConsidered and connected_keyword!=keyword:
-                    filtered_connections[connected_keyword] = weight
-                    currentAmountOfConnectionToBeConsidered += 1
+    #filter the outer Nodes
 
-            # Füge gefilterte Verbindungen zum gefilterten Dictionary hinzu, wenn sie vorhanden sind
-            if filtered_connections:
-                filtered_edgesDictionary[keyword] = filtered_connections
+    filtered_edgesDictionary = filterOuterNodes(edgesDictionary, minimalWeightOfConsideredConnection,
+                                                percentageAmountOfOuterNodes)
+    return filtered_edgesDictionary
 
-        #print(len(filtered_edgesDictionary))
-        #print(filtered_edgesDictionary)
-        return filtered_edgesDictionary
+
+
+def filterOuterNodes(edgesDictionary, minimalWeightOfConsideredConnection,
+                     percentageAmountOfBorderNodes):
+    '''
+    :param edgesDictionary: Ausgangs Dictionary mit allen äusseren nodes
+    :param minimalWeightOfConsideredConnection: minimale Connection, welche ein node braucht um abgebildet zu werden
+    :param percentageAmountOfBorderNodes: Der Prozentsatz an connections zu äusseren Nodes(aller connections des momentanen nodes).
+    :return: Ein dictionary, welches weniger äussere Nodes berücksichtigt, als vorher
+    '''
+    filtered_edgesDictionary = {}
+    for keyword, connections in edgesDictionary.items():
+        lengthOfCurrentConnectedKeywords = len(connections)
+        amountOfConnectionsToBeConsidered = (lengthOfCurrentConnectedKeywords / 100) * percentageAmountOfBorderNodes
+        currentAmountOfConnectionToBeConsidered = 0
+
+        # Sortieren der Verbindungen nach Gewicht
+        sorted_connections = dict(sorted(connections.items(), key=lambda item: item[1], reverse=True))
+        # Initialisiere eine neue Liste für gefilterte Verbindungen
+        filtered_connections = {}
+
+        for connected_keyword, weight in sorted_connections.items():
+            # print(connected_keyword, weight)
+            if weight >= minimalWeightOfConsideredConnection and currentAmountOfConnectionToBeConsidered < amountOfConnectionsToBeConsidered and connected_keyword != keyword:
+                filtered_connections[connected_keyword] = weight
+                currentAmountOfConnectionToBeConsidered += 1
+
+        # Füge gefilterte Verbindungen zum gefilterten Dictionary hinzu, wenn sie vorhanden sind
+        if filtered_connections:
+            filtered_edgesDictionary[keyword] = filtered_connections
+    return filtered_edgesDictionary
+
 createEdges(countKeywords())
