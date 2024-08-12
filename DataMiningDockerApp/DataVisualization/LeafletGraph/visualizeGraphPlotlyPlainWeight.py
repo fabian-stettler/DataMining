@@ -7,6 +7,8 @@ from DataVisualization.LeafletGraph.createEdges import createEdges
 
 def visualize_large_graph_plotly(edges_dict):
     print(edges_dict)
+    multiplicatorNodesSize = 0.05
+
     # Create a graph
     G = nx.Graph()
 
@@ -16,7 +18,7 @@ def visualize_large_graph_plotly(edges_dict):
             G.add_edge(keyword, connected_keyword, weight=weight)
 
     # Position nodes using a layout algorithm suitable for large graphs
-    pos = nx.spring_layout(G, k=3, iterations=100)
+    pos = nx.spring_layout(G, k=4, iterations=100)
 
     # Calculate the sum of weights for each node
     node_weights = {}
@@ -25,7 +27,7 @@ def visualize_large_graph_plotly(edges_dict):
         node_weights[node] = total_weight
 
     # Set node sizes based on the sum of weights, with a smaller overall scale
-    node_sizes = [node_weights[node] * .05 for node in G.nodes()]  # Adjusted scale for node size
+    node_sizes = [node_weights[node] * multiplicatorNodesSize for node in G.nodes()]  # Adjusted scale for node size
     node_color_values = list(node_weights.values())  # Use the weight sums for color
 
 

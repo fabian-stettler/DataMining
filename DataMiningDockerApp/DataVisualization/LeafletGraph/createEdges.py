@@ -2,38 +2,49 @@ from DataVisualization.LeafletGraph.countKeywords import countKeywords, getMongo
 from connectToMongoDBCollection import connectToMongoDBCollection
 from constants import KEYWORDS_TO_IGNORE
 
+#constants
+PERCENTAGE_OF_INNER_NODES = 20
+PERCENTAGE_OF_OUTER_NODES = 30
+MINIMAL_WEIGHT_OF_CONSIDERED_CONNECTION = 20
+
+
+
+
 def update_edges(key, edgesDictionary, allKeywords):
     '''
 
-    :param key: is the keyword which serves as a key in the outer dictionary
-    :param edgesDictionary:
-    :param additional_keywords:
-    :param base_keywords:
-    dictConnectedKeywords is the dictionary within the edgesDictionary and holds the connected keywords and the weight of this edge.
-    :return:
+    :param key: is the current key to analyze and update the outer dict
+    :param edgesDictionary: current version of the final dictionary
+    :param allKeywords: Matrix mit Artikeln und ihren Keywords
+    :return: eine neu version mit einem updgedateten inner dict für key.
+    :keyword ist ein einziges keyword in einem Artikel
+    die Funktion schaut nach ob sich key in einem der Artikel befindet, wenn ja macht key in seinem innerdict updates zu allen keywords,
+    welche sich in diesem Artikel befinden.
+    Es wird ein break gemacht, wenn ein Artikel berücksichtigt worden ist.
     '''
-
-    #print(allKeywords)
 
     for keywordsOfArticle in allKeywords:
         for keyword in keywordsOfArticle:
-            #print("This is an element" + keywordsOfArticle)
-            if key in keyword:
+            #print(f"This is a keyword: {keyword}")
+            if key == keyword:
                 dictConnectedKeywords = edgesDictionary.get(key)
                 if dictConnectedKeywords is None:
                     #dict to this keyword does not exist
                     edgesDictionary[key] = {}
                     connectedKeywords = edgesDictionary[key]
-                    connectedKeywords[keyword] = 1
+                    for currentKeyword in keywordsOfArticle:
+                        connectedKeywords[currentKeyword] = 1
+                    break
                 else:
                     #dict to this keyword exists already
-                    connectedKeywords = dictConnectedKeywords.get(keyword)
-                    if connectedKeywords is None:
-                        #inner dict does not contain connected keywords
-                        dictConnectedKeywords[keyword] = 1
-                    else:
-                        #inner dict does contain the connected keyword
-                        dictConnectedKeywords[keyword] = connectedKeywords + 1
+                    for currentKeyword in keywordsOfArticle:
+                        if currentKeyword not in dictConnectedKeywords:
+                            dictConnectedKeywords[currentKeyword] = 1
+                        else:
+                            count = dictConnectedKeywords.get(currentKeyword)
+                            dictConnectedKeywords[currentKeyword] = count + 1
+                    break
+
     return edgesDictionary
 def createEdges(sorted_keywords):
     '''
@@ -41,9 +52,6 @@ def createEdges(sorted_keywords):
     :return: eine dict Matrix mit den topkeys und allen connected keywords mit ihrer Anzahl
     '''
     #constants to manipulate amount of nodes and structure of the graph
-    percentageOfInnerNodes = 20
-    percentageAmountOfOuterNodes = 30
-    minimalWeightOfConsideredConnection = 8
 
     #remove all keywords which are in our exlude List
     articlesWithKeywords = getMongoDBEntries()
@@ -55,7 +63,7 @@ def createEdges(sorted_keywords):
     lengthKeywords = len(sorted_keywords)
 
     #define the amount of inner nodes
-    amountOfInnerNodes = int((lengthKeywords/100) * percentageOfInnerNodes)
+    amountOfInnerNodes = int((lengthKeywords/100) * PERCENTAGE_OF_INNER_NODES)
 
     #extract the all keys of our sorted_keywords
     keys = list(sorted_keywords.keys())
@@ -70,8 +78,8 @@ def createEdges(sorted_keywords):
 
     #filter the outer Nodes
 
-    filtered_edgesDictionary = filterOuterNodes(edgesDictionary, minimalWeightOfConsideredConnection,
-                                                percentageAmountOfOuterNodes)
+    filtered_edgesDictionary = filterOuterNodes(edgesDictionary, MINIMAL_WEIGHT_OF_CONSIDERED_CONNECTION,
+                                                PERCENTAGE_OF_OUTER_NODES)
     return filtered_edgesDictionary
 
 
