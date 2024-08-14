@@ -149,5 +149,5 @@ def controlSentimentExtraction(aspect, date_str):
 
     else:
         print("not entered in Mongo add function")
-controlSentimentExtraction('Selenski', BEGINNING_DATE)
+controlSentimentExtraction('Krieg', BEGINNING_DATE)
 

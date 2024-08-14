@@ -1,4 +1,5 @@
 from connectToMongoDBCollection import connectToMongoDBCollection
+from constants import SCHWELLWERT_SENTIMENT_CONFIDENCE
 
 
 def sentimentAnalysis(aspect, filter):
@@ -29,10 +30,13 @@ def sentimentAnalysis(aspect, filter):
                     connectingArticlesNegative.append(sample.get('title'))
                 if (sentiment == 'positive'):
                     connectingArticlesPositive.append(sample.get('title'))
+                        
         print("Negative Sentiments: " + str(sentimentArray.count("negative")))
         print("Neutrale Sentiments: " + str(sentimentArray.count("neutral")))
         print("Positive Sentiments: " + str(sentimentArray.count("positive")))
         print("Articles related to sentiments negative" + str(connectingArticlesNegative))
         print("Articles related to sentiments positive" + str(connectingArticlesPositive))
+        #return sentimentArray.count("positive"), sentimentArray.count("negative"),sentimentArray.count("neutral")
 
-sentimentAnalysis("Trump", 0.9)
+
+sentimentAnalysis("Putin", SCHWELLWERT_SENTIMENT_CONFIDENCE)

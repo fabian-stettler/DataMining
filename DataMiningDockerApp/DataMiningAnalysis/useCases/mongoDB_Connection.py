@@ -55,4 +55,4 @@ document = {
 }
 
 # Insert the document into the collection
-collection.insert_one(document)
+#collection.insert_one(document)
